@@ -11,8 +11,13 @@ if (!databaseUrl) {
 }
 
 // Use the actual URL or a dummy one that will fail gracefully
-const url = databaseUrl || "postgres://dummy:dummy@dummy:5432/dummy?sslmode=require";
+let url = databaseUrl || "postgres://dummy:dummy@dummy:5432/dummy?sslmode=require";
+
+// Clean up the connection string if it's in psql format
+if (url.startsWith("psql '")) {
+  url = url.replace("psql '", "").replace("'", "");
+}
+
 const sql = neon(url);
 export const db = drizzle({ client: sql });
-
 
