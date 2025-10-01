@@ -1,7 +1,5 @@
 import React from 'react';
-import Navbar from '@/components/navbar';
 import { ProductCard, PromotionalCard } from '@/components/card';
-import Footer from '@/components/footer';
 
 const Home = () => {
   // Placeholder product data
@@ -145,55 +143,50 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-light-100">
-      <Navbar cartCount={3} />
-      
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="bg-light-200 py-16 lg:py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-heading-1 text-dark-900 mb-6">
-              Nike Store
-            </h1>
-            <p className="text-lead text-dark-700 max-w-2xl mx-auto">
-              Discover the latest collection of Nike shoes, clothing, and accessories. 
-              Find your perfect style and performance gear.
-            </p>
-          </div>
-        </section>
+    <>
+      {/* Hero Section */}
+      <section className="bg-light-200 py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-heading-1 text-dark-900 mb-6">
+            Nike Store
+          </h1>
+          <p className="text-lead text-dark-700 max-w-2xl mx-auto">
+            Discover the latest collection of Nike shoes, clothing, and accessories. 
+            Find your perfect style and performance gear.
+          </p>
+        </div>
+      </section>
 
-        {/* Featured Products Section */}
-        <section className="py-16 lg:py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-heading-2 text-dark-900 mb-8 text-center">
-              Best of Air Max
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {products.map((product) => (
-                <ProductCard key={product.id} {...product} />
-              ))}
-            </div>
+      {/* Featured Products Section */}
+      <section className="py-16 lg:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-heading-2 text-dark-900 mb-8 text-center">
+            Best of Air Max
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <ProductCard key={product.id} {...product} />
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Trending Collections Section */}
-        <section className="py-16 lg:py-20 bg-light-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-heading-2 text-dark-900 mb-8 text-center">
-              Trending Collections
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {promotionalCards.map((card) => (
-                <PromotionalCard key={card.id} {...card} />
-              ))}
-            </div>
+      {/* Trending Collections Section */}
+      <section className="py-16 lg:py-20 bg-light-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-heading-2 text-dark-900 mb-8 text-center">
+            Trending Collections
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {promotionalCards.map((card) => (
+              <PromotionalCard key={card.id} {...card} />
+            ))}
           </div>
-        </section>
-      </main>
-
-      <Footer />
-    </div>
+        </div>
+      </section>
+    </>
   );
 };
 
 export default Home;
+
