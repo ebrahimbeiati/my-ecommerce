@@ -56,14 +56,9 @@ export default function Navbar() {
       >
         {/* Logo */}
         <Link href="/" aria-label="Home" className="flex items-center">
-          <Image 
-            src="/logo.svg" 
-            alt="Logo" 
-            width={32} 
-            height={32} 
-            priority 
-            className="h-8 w-8"
-          />
+          <div className="w-8 h-8 bg-dark-900 rounded-full flex items-center justify-center">
+            <span className="text-light-100 font-bold text-lg">N</span>
+          </div>
         </Link>
 
         {/* Desktop Navigation */}
