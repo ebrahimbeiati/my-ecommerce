@@ -53,11 +53,23 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (validateForm()) {
-      onSubmit(formData);
+      try {
+        const result = await onSubmit(formData);
+        if (result?.success) {
+          // Redirect to home page on success
+          window.location.href = '/';
+        } else if (result?.error) {
+          // Show error message
+          setErrors({ general: result.error });
+        }
+      } catch (error) {
+        console.error('Form submission error:', error);
+        setErrors({ general: 'An unexpected error occurred. Please try again.' });
+      }
     }
   };
 
@@ -213,6 +225,19 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
           </a>
         </p>
       )}
+
+      {/* Switch between Sign In and Sign Up */}
+      <div className="mt-6 text-center">
+        <p className="text-body text-dark-700">
+          {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+          <a
+            href={isSignUp ? '/sign-in' : '/sign-up'}
+            className="text-dark-900 font-medium hover:text-dark-700 underline transition-colors"
+          >
+            {isSignUp ? 'Sign In' : 'Sign Up'}
+          </a>
+        </p>
+      </div>
     </form>
   );
 }

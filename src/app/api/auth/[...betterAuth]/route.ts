@@ -1,8 +1,10 @@
-import { betterAuth } from "better-auth";
+import { auth } from "@/lib/auth";
 
-export const { GET, POST } = betterAuth({
-	secret: process.env.AUTH_SECRET ?? "",
-	emailAndPassword: { enabled: true },
-});
+export async function GET(request: Request) {
+  return auth.handler(request);
+}
 
+export async function POST(request: Request) {
+  return auth.handler(request);
+}
 
