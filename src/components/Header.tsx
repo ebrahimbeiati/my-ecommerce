@@ -11,7 +11,7 @@ export default function Header() {
       <div className="mx-auto max-w-5xl px-8 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Adidas Store</h1>
+            <h1 className="text-2xl font-bold">Nike Store</h1>
             <p className="text-sm text-gray-500">Premium Athletic Wear</p>
           </div>
           

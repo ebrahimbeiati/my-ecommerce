@@ -27,5 +27,5 @@ npm run db:seed
 # Restart dev server
 npm run dev
 
-🎉 Your Adidas products will appear at http://localhost:3000!
+🎉 Your Nike products will appear at http://localhost:3000!
 `);

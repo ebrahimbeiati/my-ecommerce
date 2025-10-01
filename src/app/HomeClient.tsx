@@ -32,7 +32,7 @@ export default function HomeClient({ products, usingMockData }: HomeClientProps)
 
   return (
     <main className="mx-auto max-w-5xl p-8">
-      <h1 className="text-2xl font-bold mb-6">Adidas Products</h1>
+      <h1 className="text-2xl font-bold mb-6">Nike Products</h1>
       
       {usingMockData && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">

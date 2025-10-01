@@ -8,8 +8,8 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: "Adidas Store",
-  description: "An e-commerce store for Adidas products",
+  title: "Nike Store",
+  description: "An e-commerce store for Nike products",
 };
 
 export default function RootLayout({
