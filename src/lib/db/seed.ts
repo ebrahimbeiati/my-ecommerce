@@ -31,7 +31,7 @@ function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-async function seed() {
+export async function seed() {
   try {
     log('Seeding filters: genders, colors, sizes');
 
@@ -210,4 +210,7 @@ async function seed() {
   }
 }
 
-seed();
+// Run seed if this file is executed directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  seed();
+}
