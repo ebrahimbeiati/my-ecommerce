@@ -1,7 +1,7 @@
 import { pgEnum, pgTable, uuid, timestamp, numeric, integer } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { z } from 'zod';
-import { user } from './user';
+import { users } from './user';
 import { addresses } from './addresses';
 import { productVariants } from './variants';
 
@@ -9,7 +9,7 @@ export const orderStatusEnum = pgEnum('order_status', ['pending', 'paid', 'shipp
 
 export const orders = pgTable('orders', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => user.id, { onDelete: 'set null' }),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
   status: orderStatusEnum('status').notNull().default('pending'),
   totalAmount: numeric('total_amount', { precision: 10, scale: 2 }).notNull(),
   shippingAddressId: uuid('shipping_address_id').references(() => addresses.id, { onDelete: 'set null' }),
@@ -26,9 +26,9 @@ export const orderItems = pgTable('order_items', {
 });
 
 export const ordersRelations = relations(orders, ({ many, one }) => ({
-  user: one(user, {
+  user: one(users, {
     fields: [orders.userId],
-    references: [user.id],
+    references: [users.id],
   }),
   shippingAddress: one(addresses, {
     fields: [orders.shippingAddressId],

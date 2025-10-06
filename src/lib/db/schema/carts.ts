@@ -1,13 +1,13 @@
 import { pgTable, uuid, timestamp, integer } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { z } from 'zod';
-import { user } from './user';
+import { users  } from './user';
 import { guests } from './guests';
 import { productVariants } from './variants';
 
 export const carts = pgTable('carts', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => user.id, { onDelete: 'set null' }),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
   guestId: uuid('guest_id').references(() => guests.id, { onDelete: 'set null' }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -19,11 +19,10 @@ export const cartItems = pgTable('cart_items', {
   productVariantId: uuid('product_variant_id').references(() => productVariants.id, { onDelete: 'restrict' }).notNull(),
   quantity: integer('quantity').notNull().default(1),
 });
-
 export const cartsRelations = relations(carts, ({ many, one }) => ({
-  user: one(user, {
+  user: one(users, {
     fields: [carts.userId],
-    references: [user.id],
+    references: [users.id],
   }),
   guest: one(guests, {
     fields: [carts.guestId],

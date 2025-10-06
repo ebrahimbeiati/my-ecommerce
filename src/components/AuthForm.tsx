@@ -5,7 +5,7 @@ import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 
 interface AuthFormProps {
   type: 'signin' | 'signup';
-  onSubmit: (data: FormData) => void;
+  onSubmit: (data: FormData) => Promise<{ success?: boolean; error?: string } | void>;
 }
 
 interface FormData {
@@ -21,7 +21,7 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
     name: '',
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [errors, setErrors] = useState<Partial<FormData> & { general?: string }>({});
 
   const isSignUp = type === 'signup';
 
@@ -58,13 +58,19 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
     
     if (validateForm()) {
       try {
+        console.log('Submitting form:', { type, email: formData.email });
         const result = await onSubmit(formData);
+        console.log('Form result:', result);
+        
         if (result?.success) {
-          // Redirect to home page on success
+          console.log('Success! Redirecting...');
           window.location.href = '/';
         } else if (result?.error) {
-          // Show error message
+          console.log('Error:', result.error);
           setErrors({ general: result.error });
+        } else {
+          console.log('No success or error returned');
+          setErrors({ general: 'An unexpected error occurred. Please try again.' });
         }
       } catch (error) {
         console.error('Form submission error:', error);

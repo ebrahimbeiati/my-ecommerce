@@ -2,12 +2,12 @@ import { pgTable, text, timestamp, uuid, integer } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { products } from './products';
-import { user } from './user';
+import { users } from './user';
 
 export const reviews = pgTable('reviews', {
   id: uuid('id').primaryKey().defaultRandom(),
   productId: uuid('product_id').references(() => products.id, { onDelete: 'cascade' }).notNull(),
-  userId: uuid('user_id').references(() => user.id, { onDelete: 'cascade' }).notNull(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   rating: integer('rating').notNull(),
   comment: text('comment'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -20,9 +20,9 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
     fields: [reviews.productId],
     references: [products.id],
   }),
-  user: one(user, {
+  user: one(users, {
     fields: [reviews.userId],
-    references: [user.id],
+    references: [users.id],
   }),
 }));
 

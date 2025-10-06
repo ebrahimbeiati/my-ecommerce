@@ -72,6 +72,12 @@ export async function signUp(data: { name?: string; email: string; password: str
       },
     });
 
+    // Merge guest cart into user cart
+    if (res.user?.id) {
+      const { mergeGuestCart } = await import("@/lib/actions/cart");
+      await mergeGuestCart(res.user.id);
+    }
+
     await migrateGuestToUser();
     return { success: true, data: { userId: res.user?.id } };
   } catch (error) {
@@ -104,6 +110,12 @@ export async function signIn(data: { email: string; password: string }) {
         password: validatedData.password,
       },
     });
+
+    // Merge guest cart into user cart
+    if (res.user?.id) {
+      const { mergeGuestCart } = await import("@/lib/actions/cart");
+      await mergeGuestCart(res.user.id);
+    }
 
     await migrateGuestToUser();
     return { success: true, data: { userId: res.user?.id } };

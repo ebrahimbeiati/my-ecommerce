@@ -1,13 +1,13 @@
 import { pgEnum, pgTable, text, uuid, boolean } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 import { relations } from 'drizzle-orm';
-import { user } from './user';
+import { users } from './user';
 
 export const addressTypeEnum = pgEnum('address_type', ['billing', 'shipping']);
 
 export const addresses = pgTable('addresses', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => user.id, { onDelete: 'cascade' }).notNull(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   type: addressTypeEnum('type').notNull(),
   line1: text('line1').notNull(),
   line2: text('line2'),
@@ -19,9 +19,9 @@ export const addresses = pgTable('addresses', {
 });
 
 export const addressesRelations = relations(addresses, ({ one }) => ({
-  user: one(user, {
+  user: one(users, {
     fields: [addresses.userId],
-    references: [user.id],
+    references: [users.id],
   }),
 }));
 

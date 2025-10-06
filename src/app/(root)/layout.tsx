@@ -9,7 +9,7 @@ export default function RootGroupLayout({
 }) {
   return (
     <div className="min-h-screen flex flex-col bg-light-100">
-      <Navbar cartCount={3} />
+      <Navbar />
       <main className="flex-1">
         {children}
       </main>

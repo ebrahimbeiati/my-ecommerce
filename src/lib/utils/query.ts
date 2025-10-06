@@ -55,13 +55,13 @@ export function parseQueryParams(search: string): ProductQueryParams {
       // Flatten nested arrays and filter out empty strings
       const flatValues = value.flat().filter((v) => v && v.trim());
       // Deduplicate and store
-      deduplicatedParams[key as keyof ProductQueryParams] = Array.from(new Set(flatValues)) as any;
+      deduplicatedParams[key as keyof ProductQueryParams] = Array.from(new Set(flatValues)) as string[] & string;
     } else if (typeof value === 'string' && value.includes(',')) {
       // Handle case where string contains commas (mixed encoding)
       const splitValues = value.split(',').map((v) => v.trim()).filter(Boolean);
-      deduplicatedParams[key as keyof ProductQueryParams] = Array.from(new Set(splitValues)) as any;
+      deduplicatedParams[key as keyof ProductQueryParams] = Array.from(new Set(splitValues)) as string[] & string;
     } else if (value) {
-      deduplicatedParams[key as keyof ProductQueryParams] = value as any;
+      deduplicatedParams[key as keyof ProductQueryParams] = value as string & string[];
     }
   }
 
@@ -90,7 +90,7 @@ export function stringifyQueryParams(params: ProductQueryParams): string {
       }
       return acc;
     },
-    {} as Record<string, any>
+    {} as Record<string, string | string[]>
   );
 
   return queryString.stringify(cleanParams, {
@@ -117,9 +117,9 @@ export function addQueryParam(
   
   // Handle array values (multi-select filters)
   if (Array.isArray(value)) {
-    params[key as keyof ProductQueryParams] = value as any;
+    params[key as keyof ProductQueryParams] = value as string[] & string;
   } else {
-    params[key as keyof ProductQueryParams] = value as any;
+    params[key as keyof ProductQueryParams] = value as string & string[];
   }
 
   return stringifyQueryParams(params);

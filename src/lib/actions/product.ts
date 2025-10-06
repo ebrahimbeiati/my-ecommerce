@@ -11,7 +11,7 @@ import {
   products,
   sizes,
   colors,
-  user,
+  users,
   reviews,
   type SelectProduct,
   type SelectVariant,
@@ -234,67 +234,68 @@ export type FullProduct = {
 };
 
 export async function getProduct(productId: string): Promise<FullProduct | null> {
-  const rows = await db
-    .select({
-      productId: products.id,
-      productName: products.name,
-      productDescription: products.description,
-      productBrandId: products.brandId,
-      productCategoryId: products.categoryId,
-      productGenderId: products.genderId,
-      isPublished: products.isPublished,
-      defaultVariantId: products.defaultVariantId,
-      productCreatedAt: products.createdAt,
-      productUpdatedAt: products.updatedAt,
+  try {
+    const rows = await db
+      .select({
+        productId: products.id,
+        productName: products.name,
+        productDescription: products.description,
+        productBrandId: products.brandId,
+        productCategoryId: products.categoryId,
+        productGenderId: products.genderId,
+        isPublished: products.isPublished,
+        defaultVariantId: products.defaultVariantId,
+        productCreatedAt: products.createdAt,
+        productUpdatedAt: products.updatedAt,
 
-      brandId: brands.id,
-      brandName: brands.name,
-      brandSlug: brands.slug,
-      brandLogoUrl: brands.logoUrl,
+        brandId: brands.id,
+        brandName: brands.name,
+        brandSlug: brands.slug,
+        brandLogoUrl: brands.logoUrl,
 
-      categoryId: categories.id,
-      categoryName: categories.name,
-      categorySlug: categories.slug,
+        categoryId: categories.id,
+        categoryName: categories.name,
+        categorySlug: categories.slug,
 
-      genderId: genders.id,
-      genderLabel: genders.label,
-      genderSlug: genders.slug,
+        genderId: genders.id,
+        genderLabel: genders.label,
+        genderSlug: genders.slug,
 
-      variantId: productVariants.id,
-      variantSku: productVariants.sku,
-      variantPrice: sql<number | null>`${productVariants.price}::numeric`,
-      variantSalePrice: sql<number | null>`${productVariants.salePrice}::numeric`,
-      variantColorId: productVariants.colorId,
-      variantSizeId: productVariants.sizeId,
-      variantInStock: productVariants.inStock,
+        variantId: productVariants.id,
+        variantSku: productVariants.sku,
+        variantPrice: sql<number | null>`${productVariants.price}::numeric`,
+        variantSalePrice: sql<number | null>`${productVariants.salePrice}::numeric`,
+        variantColorId: productVariants.colorId,
+        variantSizeId: productVariants.sizeId,
+        variantInStock: productVariants.inStock,
 
-      colorId: colors.id,
-      colorName: colors.name,
-      colorSlug: colors.slug,
-      colorHex: colors.hexCode,
+        colorId: colors.id,
+        colorName: colors.name,
+        colorSlug: colors.slug,
+        colorHex: colors.hexCode,
 
-      sizeId: sizes.id,
-      sizeName: sizes.name,
-      sizeSlug: sizes.slug,
-      sizeSortOrder: sizes.sortOrder,
+        sizeId: sizes.id,
+        sizeName: sizes.name,
+        sizeSlug: sizes.slug,
+        sizeSortOrder: sizes.sortOrder,
 
-      imageId: productImages.id,
-      imageUrl: productImages.url,
-      imageIsPrimary: productImages.isPrimary,
-      imageSortOrder: productImages.sortOrder,
-      imageVariantId: productImages.variantId,
-    })
-    .from(products)
-    .leftJoin(brands, eq(brands.id, products.brandId))
-    .leftJoin(categories, eq(categories.id, products.categoryId))
-    .leftJoin(genders, eq(genders.id, products.genderId))
-    .leftJoin(productVariants, eq(productVariants.productId, products.id))
-    .leftJoin(colors, eq(colors.id, productVariants.colorId))
-    .leftJoin(sizes, eq(sizes.id, productVariants.sizeId))
-    .leftJoin(productImages, eq(productImages.productId, products.id))
-    .where(eq(products.id, productId));
+        imageId: productImages.id,
+        imageUrl: productImages.url,
+        imageIsPrimary: productImages.isPrimary,
+        imageSortOrder: productImages.sortOrder,
+        imageVariantId: productImages.variantId,
+      })
+      .from(products)
+      .leftJoin(brands, eq(brands.id, products.brandId))
+      .leftJoin(categories, eq(categories.id, products.categoryId))
+      .leftJoin(genders, eq(genders.id, products.genderId))
+      .leftJoin(productVariants, eq(productVariants.productId, products.id))
+      .leftJoin(colors, eq(colors.id, productVariants.colorId))
+      .leftJoin(sizes, eq(sizes.id, productVariants.sizeId))
+      .leftJoin(productImages, eq(productImages.productId, products.id))
+      .where(eq(products.id, productId));
 
-  if (!rows.length) return null;
+    if (!rows.length) return null;
 
   const head = rows[0];
 
@@ -385,11 +386,15 @@ export async function getProduct(productId: string): Promise<FullProduct | null>
     }
   }
 
-  return {
-    product,
-    variants: Array.from(variantsMap.values()),
-    images: Array.from(imagesMap.values()),
-  };
+    return {
+      product,
+      variants: Array.from(variantsMap.values()),
+      images: Array.from(imagesMap.values()),
+    };
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    return null;
+  }
 }
 export type Review = {
   id: string;
@@ -408,44 +413,50 @@ export type RecommendedProduct = {
 };
 
 export async function getProductReviews(productId: string): Promise<Review[]> {
-  const rows = await db
-    .select({
-      id: reviews.id,
-      rating: reviews.rating,
-      comment: reviews.comment,
-      createdAt: reviews.createdAt,
-      authorName: user.name,
-      authorEmail: user.email,
-    })
-    .from(reviews)
-    .innerJoin(user, eq(user.id, reviews.userId))
-    .where(eq(reviews.productId, productId))
-    .orderBy(desc(reviews.createdAt))
-    .limit(10);
+  try {
+    const rows = await db
+      .select({
+        id: reviews.id,
+        rating: reviews.rating,
+        comment: reviews.comment,
+        createdAt: reviews.createdAt,
+        authorName: users.name,
+        authorEmail: users.email,
+      })
+      .from(reviews)
+      .innerJoin(users, eq(users.id, reviews.userId))
+      .where(eq(reviews.productId, productId))
+      .orderBy(desc(reviews.createdAt))
+      .limit(10);
 
-  return rows.map((r) => ({
-    id: r.id,
-    author: r.authorName?.trim() || r.authorEmail || "Anonymous",
-    rating: r.rating,
-    title: undefined,
-    content: r.comment || "",
-    createdAt: r.createdAt.toISOString(),
-  }));
+    return rows.map((r) => ({
+      id: r.id,
+      author: r.authorName?.trim() || r.authorEmail || "Anonymous",
+      rating: r.rating,
+      title: undefined,
+      content: r.comment || "",
+      createdAt: r.createdAt.toISOString(),
+    }));
+  } catch (error) {
+    console.error('Error fetching product reviews:', error);
+    return [];
+  }
 }
 
 export async function getRecommendedProducts(productId: string): Promise<RecommendedProduct[]> {
-  const base = await db
-    .select({
-      id: products.id,
-      categoryId: products.categoryId,
-      brandId: products.brandId,
-      genderId: products.genderId,
-    })
-    .from(products)
-    .where(eq(products.id, productId))
-    .limit(1);
+  try {
+    const base = await db
+      .select({
+        id: products.id,
+        categoryId: products.categoryId,
+        brandId: products.brandId,
+        genderId: products.genderId,
+      })
+      .from(products)
+      .where(eq(products.id, productId))
+      .limit(1);
 
-  if (!base.length) return [];
+    if (!base.length) return [];
   const b = base[0];
 
   const v = db
@@ -493,19 +504,23 @@ export async function getRecommendedProducts(productId: string): Promise<Recomme
     )
     .limit(8);
 
-  const out: RecommendedProduct[] = [];
-  for (const r of rows) {
-    const img = r.imageUrl?.trim();
-    if (!img) continue;
-    out.push({
-      id: r.id,
-      title: r.title,
-      price: r.minPrice === null ? null : Number(r.minPrice),
-      imageUrl: img,
-    });
-    if (out.length >= 6) break;
+    const out: RecommendedProduct[] = [];
+    for (const r of rows) {
+      const img = r.imageUrl?.trim();
+      if (!img) continue;
+      out.push({
+        id: r.id,
+        title: r.title,
+        price: r.minPrice === null ? null : Number(r.minPrice),
+        imageUrl: img,
+      });
+      if (out.length >= 6) break;
+    }
+    return out;
+  } catch (error) {
+    console.error('Error fetching recommended products:', error);
+    return [];
   }
-  return out;
 }
 
 export async function getFilterOptions() {
