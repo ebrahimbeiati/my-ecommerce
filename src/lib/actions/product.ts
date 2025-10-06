@@ -507,3 +507,15 @@ export async function getRecommendedProducts(productId: string): Promise<Recomme
   }
   return out;
 }
+
+export async function getFilterOptions() {
+  const [brandsData, categoriesData] = await Promise.all([
+    db.select({ name: brands.name, slug: brands.slug }).from(brands).orderBy(asc(brands.name)),
+    db.select({ name: categories.name, slug: categories.slug }).from(categories).orderBy(asc(categories.name)),
+  ]);
+
+  return {
+    brands: brandsData.map(b => ({ label: b.name, value: b.slug })),
+    categories: categoriesData.map(c => ({ label: c.name, value: c.slug })),
+  };
+}

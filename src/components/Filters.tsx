@@ -17,12 +17,12 @@ const FILTER_OPTIONS = {
     { label: 'Unisex', value: 'unisex' },
   ],
   size: [
-    { label: 'Size 7', value: '7' },
-    { label: 'Size 8', value: '8' },
-    { label: 'Size 9', value: '9' },
-    { label: 'Size 10', value: '10' },
-    { label: 'Size 11', value: '11' },
-    { label: 'Size 12', value: '12' },
+    { label: '7', value: '7' },
+    { label: '8', value: '8' },
+    { label: '9', value: '9' },
+    { label: '10', value: '10' },
+    { label: '11', value: '11' },
+    { label: '12', value: '12' },
   ],
   color: [
     { label: 'Black', value: 'black', hex: '#000000' },
@@ -42,15 +42,19 @@ const FILTER_OPTIONS = {
 
 interface FiltersProps {
   className?: string;
+  brands?: Array<{ label: string; value: string }>;
+  categories?: Array<{ label: string; value: string }>;
 }
 
-export default function Filters({ className = '' }: FiltersProps) {
+export default function Filters({ className = '', brands = [], categories = [] }: FiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     gender: true,
+    brand: brands.length > 0,
+    category: categories.length > 0,
     size: true,
     color: true,
     priceRange: true,
@@ -147,6 +151,100 @@ export default function Filters({ className = '' }: FiltersProps) {
           </div>
         )}
       </div>
+
+      {/* Brand Filter */}
+      {brands.length > 0 && (
+        <div className="border-b border-light-300 pb-4">
+          <button
+            onClick={() => toggleSection('brand')}
+            className="flex items-center justify-between w-full text-left group"
+          >
+            <h3 className="text-body-medium text-dark-900 font-medium">Brand</h3>
+            <svg
+              className={`w-5 h-5 text-dark-700 transition-transform ${
+                expandedSections.brand ? 'rotate-180' : ''
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+          {expandedSections.brand && (
+            <div className="mt-3 space-y-2">
+              {brands.map((option) => (
+                <label
+                  key={option.value}
+                  className="flex items-center space-x-3 cursor-pointer group"
+                >
+                  <input
+                    type="checkbox"
+                    checked={isFilterActive(currentSearch, 'brand', option.value)}
+                    onChange={() => handleFilterToggle('brand', option.value)}
+                    className="w-4 h-4 rounded border-light-400 text-dark-900 focus:ring-2 focus:ring-dark-900 focus:ring-offset-0 cursor-pointer"
+                  />
+                  <span className="text-body text-dark-700 group-hover:text-dark-900 transition-colors">
+                    {option.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Category Filter */}
+      {categories.length > 0 && (
+        <div className="border-b border-light-300 pb-4">
+          <button
+            onClick={() => toggleSection('category')}
+            className="flex items-center justify-between w-full text-left group"
+          >
+            <h3 className="text-body-medium text-dark-900 font-medium">Category</h3>
+            <svg
+              className={`w-5 h-5 text-dark-700 transition-transform ${
+                expandedSections.category ? 'rotate-180' : ''
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+          {expandedSections.category && (
+            <div className="mt-3 space-y-2">
+              {categories.map((option) => (
+                <label
+                  key={option.value}
+                  className="flex items-center space-x-3 cursor-pointer group"
+                >
+                  <input
+                    type="checkbox"
+                    checked={isFilterActive(currentSearch, 'category', option.value)}
+                    onChange={() => handleFilterToggle('category', option.value)}
+                    className="w-4 h-4 rounded border-light-400 text-dark-900 focus:ring-2 focus:ring-dark-900 focus:ring-offset-0 cursor-pointer"
+                  />
+                  <span className="text-body text-dark-700 group-hover:text-dark-900 transition-colors">
+                    {option.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Size Filter */}
       <div className="border-b border-light-300 pb-4">

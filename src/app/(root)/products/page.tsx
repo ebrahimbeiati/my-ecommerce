@@ -4,7 +4,7 @@ import Filters from '@/components/Filters';
 import Sort from '@/components/Sort';
 import FilterBadge from '@/components/FilterBadge';
 import { parseFilterParams, getActiveFilters } from '@/lib/utils/query';
-import { getAllProducts } from '@/lib/actions/product';
+import { getAllProducts, getFilterOptions } from '@/lib/actions/product';
 
 interface ProductsPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -17,8 +17,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   // Parse filters from URL params
   const filters = parseFilterParams(params);
 
-  // Fetch products from database
-  const { products, totalCount } = await getAllProducts(filters);
+  // Fetch products and filter options from database
+  const [{ products, totalCount }, filterOptions] = await Promise.all([
+    getAllProducts(filters),
+    getFilterOptions(),
+  ]);
 
   // Convert to search string for filter badges
   const searchString = new URLSearchParams(
@@ -91,7 +94,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         <div className="flex flex-col md:flex-row gap-8">
           {/* Filters Sidebar */}
           <div className="w-full md:w-64 flex-shrink-0">
-            <Filters />
+            <Filters 
+              brands={filterOptions.brands}
+              categories={filterOptions.categories}
+            />
           </div>
 
           {/* Products Grid */}
