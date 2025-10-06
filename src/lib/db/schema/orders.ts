@@ -55,7 +55,7 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
 export const insertOrderSchema = z.object({
   userId: z.string().uuid().optional().nullable(),
   status: z.enum(['pending', 'paid', 'shipped', 'delivered', 'cancelled']).optional(),
-  totalAmount: z.number(),
+  totalAmount: z.string().regex(/^\d+(\.\d{1,2})?$/),
   shippingAddressId: z.string().uuid().optional().nullable(),
   billingAddressId: z.string().uuid().optional().nullable(),
   createdAt: z.date().optional(),
@@ -70,7 +70,7 @@ export const insertOrderItemSchema = z.object({
   orderId: z.string().uuid(),
   productVariantId: z.string().uuid(),
   quantity: z.number().int().min(1),
-  priceAtPurchase: z.number(),
+  priceAtPurchase: z.string().regex(/^\d+(\.\d{1,2})?$/),
 });
 export const selectOrderItemSchema = insertOrderItemSchema.extend({
   id: z.string().uuid(),

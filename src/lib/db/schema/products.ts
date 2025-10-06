@@ -4,6 +4,11 @@ import { z } from 'zod';
 import { categories } from './categories';
 import { genders } from './filters/genders';
 import { brands } from './brands';
+import { productVariants } from './variants';
+import { productImages } from './images';
+import { reviews } from './reviews';
+import { wishlists } from './wishlists';
+import { productCollections } from './collections';
 
 export const products = pgTable('products', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -18,7 +23,7 @@ export const products = pgTable('products', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export const productsRelations = relations(products, ({ one }) => ({
+export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, {
     fields: [products.categoryId],
     references: [categories.id],
@@ -31,6 +36,11 @@ export const productsRelations = relations(products, ({ one }) => ({
     fields: [products.brandId],
     references: [brands.id],
   }),
+  variants: many(productVariants),
+  images: many(productImages),
+  reviews: many(reviews),
+  wishlists: many(wishlists),
+  collections: many(productCollections),
 }));
 
 export const insertProductSchema = z.object({

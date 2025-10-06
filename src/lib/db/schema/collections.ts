@@ -17,7 +17,7 @@ export const productCollections = pgTable('product_collections', {
 });
 
 export const collectionsRelations = relations(collections, ({ many }) => ({
-  junctions: many(productCollections),
+  products: many(productCollections),
 }));
 
 export const productCollectionsRelations = relations(productCollections, ({ one }) => ({
