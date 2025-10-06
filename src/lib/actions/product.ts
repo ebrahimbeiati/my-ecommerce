@@ -178,19 +178,30 @@ export async function getAllProducts(filters: NormalizedProductFilters): Promise
     .leftJoin(categories, eq(categories.id, products.categoryId))
     .where(baseWhere)
     .groupBy(products.id, products.name, products.createdAt, genders.label)
+    .having(sql`count(${variantJoin.variantId}) > 0`)
     .orderBy(primaryOrder, desc(products.createdAt), asc(products.id))
     .limit(limit)
     .offset(offset);
-  const countRows = await db
+  // Count only products that have matching variants
+  const countSubquery = db
     .select({
-      cnt: count(sql<number>`distinct ${products.id}`),
+      productId: products.id,
     })
     .from(products)
     .leftJoin(variantJoin, eq(variantJoin.productId, products.id))
     .leftJoin(genders, eq(genders.id, products.genderId))
     .leftJoin(brands, eq(brands.id, products.brandId))
     .leftJoin(categories, eq(categories.id, products.categoryId))
-    .where(baseWhere);
+    .where(baseWhere)
+    .groupBy(products.id)
+    .having(sql`count(${variantJoin.variantId}) > 0`)
+    .as('filtered_products');
+
+  const countRows = await db
+    .select({
+      cnt: count(),
+    })
+    .from(countSubquery);
 
   const productsOut: ProductListItem[] = rows.map((r) => ({
     id: r.id,

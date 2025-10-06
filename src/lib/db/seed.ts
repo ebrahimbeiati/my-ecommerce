@@ -126,8 +126,9 @@ export async function seed() {
     log('Creating products with variants and images');
     for (let i = 0; i < productNames.length; i++) {
       const name = productNames[i];
-      const gender = allGenders[randInt(0, allGenders.length - 1)];
-      const catPick = [shoesCat, runningCat, lifestyleCat][randInt(0, 2)];
+      // Distribute genders evenly to ensure good coverage
+      const gender = allGenders[i % allGenders.length];
+      const catPick = [shoesCat, runningCat, lifestyleCat][i % 3];
       const desc = `Experience comfort and performance with ${name}.`;
 
       const product = insertProductSchema.parse({
@@ -141,8 +142,13 @@ export async function seed() {
 
       const retP = await db.insert(products).values(product as InsertProduct).returning();
       const insertedProduct = (retP as ProductRow[])[0];
+      
+      // Ensure good size coverage: each product gets at least 4 sizes, with some variety
+      const minSizes = 4;
+      const maxSizes = 6;
+      const numSizes = i < 5 ? maxSizes : randInt(minSizes, maxSizes); // First 5 products get all sizes
       const colorChoices = pick(allColors, randInt(2, Math.min(4, allColors.length)));
-      const sizeChoices = pick(allSizes, randInt(3, Math.min(6, allSizes.length)));
+      const sizeChoices = pick(allSizes, numSizes);
 
       const variantIds: string[] = [];
       let defaultVariantId: string | null = null;

@@ -4,7 +4,10 @@ import queryString from 'query-string';
  * Query parameter types for product filtering and sorting
  */
 export interface ProductQueryParams {
+  search?: string;
   gender?: string | string[];
+  brand?: string | string[];
+  category?: string | string[];
   size?: string | string[];
   color?: string | string[];
   priceRange?: string | string[];
@@ -12,6 +15,25 @@ export interface ProductQueryParams {
   maxPrice?: string;
   sort?: string;
   page?: string;
+  limit?: string;
+}
+
+/**
+ * Normalized product filters for database queries
+ */
+export interface NormalizedProductFilters {
+  search?: string;
+  genderSlugs: string[];
+  brandSlugs: string[];
+  categorySlugs: string[];
+  sizeSlugs: string[];
+  colorSlugs: string[];
+  priceMin?: number;
+  priceMax?: number;
+  priceRanges: [number | undefined, number | undefined][];
+  sort: 'price_asc' | 'price_desc' | 'latest';
+  page: number;
+  limit: number;
 }
 
 /**
@@ -270,4 +292,100 @@ export function countActiveFilters(currentSearch: string): number {
   });
 
   return count;
+}
+
+/**
+ * Parse price range string into min/max tuple
+ * @param range - Price range string (e.g., "0-100", "100-150", "200+")
+ * @returns Tuple of [min, max] where max can be undefined for open-ended ranges
+ */
+function parsePriceRange(range: string): [number | undefined, number | undefined] {
+  if (range === '0-100') return [0, 100];
+  if (range === '100-150') return [100, 150];
+  if (range === '150-200') return [150, 200];
+  if (range === '200+') return [200, undefined];
+  
+  // Handle custom ranges like "50-100"
+  const match = range.match(/^(\d+)-(\d+)$/);
+  if (match) {
+    return [Number(match[1]), Number(match[2])];
+  }
+  
+  // Handle open-ended ranges like "100+"
+  const openMatch = range.match(/^(\d+)\+$/);
+  if (openMatch) {
+    return [Number(openMatch[1]), undefined];
+  }
+  
+  return [undefined, undefined];
+}
+
+/**
+ * Convert array or single value to string array
+ */
+function toStringArray(value: string | string[] | undefined): string[] {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+/**
+ * Parse URL search params into normalized filters for database queries
+ * @param searchParams - URL search params object or search string
+ * @returns Normalized filters object ready for database queries
+ */
+export function parseFilterParams(
+  searchParams: Record<string, string | string[] | undefined> | string
+): NormalizedProductFilters {
+  // If searchParams is a string, parse it first
+  const params = typeof searchParams === 'string' 
+    ? parseQueryParams(searchParams) 
+    : searchParams as ProductQueryParams;
+
+  // Parse arrays with deduplication
+  const genderSlugs = Array.from(new Set(toStringArray(params.gender)));
+  const brandSlugs = Array.from(new Set(toStringArray(params.brand)));
+  const categorySlugs = Array.from(new Set(toStringArray(params.category)));
+  const sizeSlugs = Array.from(new Set(toStringArray(params.size)));
+  const colorSlugs = Array.from(new Set(toStringArray(params.color)));
+
+  // Parse price ranges
+  const priceRanges: [number | undefined, number | undefined][] = [];
+  const priceRangeValues = toStringArray(params.priceRange);
+  for (const range of priceRangeValues) {
+    const parsed = parsePriceRange(range);
+    if (parsed[0] !== undefined || parsed[1] !== undefined) {
+      priceRanges.push(parsed);
+    }
+  }
+
+  // Parse min/max prices
+  const priceMin = params.minPrice ? Number(params.minPrice) : undefined;
+  const priceMax = params.maxPrice ? Number(params.maxPrice) : undefined;
+
+  // Parse sort
+  let sort: NormalizedProductFilters['sort'] = 'latest';
+  if (params.sort === 'price_asc' || params.sort === 'price_desc' || params.sort === 'latest') {
+    sort = params.sort;
+  } else if (params.sort === 'newest') {
+    sort = 'latest';
+  }
+
+  // Parse pagination
+  const page = params.page ? Math.max(1, Number(params.page)) : 1;
+  const limit = params.limit ? Math.max(1, Math.min(60, Number(params.limit))) : 12;
+
+  return {
+    search: params.search?.trim() || undefined,
+    genderSlugs,
+    brandSlugs,
+    categorySlugs,
+    sizeSlugs,
+    colorSlugs,
+    priceMin: !isNaN(priceMin!) ? priceMin : undefined,
+    priceMax: !isNaN(priceMax!) ? priceMax : undefined,
+    priceRanges,
+    sort,
+    page,
+    limit,
+  };
 }
